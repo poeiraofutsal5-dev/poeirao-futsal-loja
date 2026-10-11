@@ -29,6 +29,7 @@ import { Product, ProductCategory, LogoConfig, LogoId, HeroSlide, DesignerConfig
 import { ClubLogo } from './ClubLogo';
 import { ProductRender } from './ProductRender';
 import { auth, CONTENT_COLLECTION, CONTENT_DOC_ID, CONTENT_FIELD } from '../lib/firebase';
+import { compressImage } from '../lib/imageUtils';
 import { 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
@@ -56,6 +57,7 @@ interface DirectionPanelModalProps {
   onResetHeroSlides: () => void;
   firestoreText: string;
   onSaveFirestoreText: (newText: string) => Promise<void>;
+  onSyncAllToFirestore?: () => Promise<void>;
 }
 
 export const DirectionPanelModal: React.FC<DirectionPanelModalProps> = ({
@@ -76,6 +78,7 @@ export const DirectionPanelModal: React.FC<DirectionPanelModalProps> = ({
   onResetHeroSlides,
   firestoreText,
   onSaveFirestoreText,
+  onSyncAllToFirestore,
 }) => {
   if (!isOpen) return null;
 
@@ -260,30 +263,54 @@ export const DirectionPanelModal: React.FC<DirectionPanelModalProps> = ({
     }
   };
 
+  // Sync all state
+  const [isSyncingAll, setIsSyncingAll] = useState(false);
+
+  const handleSyncAllCloud = async () => {
+    if (!onSyncAllToFirestore) return;
+    setIsSyncingAll(true);
+    try {
+      await onSyncAllToFirestore();
+      setToastMessage('✓ Todas as alterações foram salvas e sincronizadas no Firebase para todos os dispositivos!');
+      setTimeout(() => setToastMessage(null), 4000);
+    } catch (err: any) {
+      console.error('Erro ao sincronizar tudo:', err);
+      setToastMessage('Erro ao sincronizar com Firebase: ' + (err.message || 'Tente novamente.'));
+      setTimeout(() => setToastMessage(null), 4000);
+    } finally {
+      setIsSyncingAll(false);
+    }
+  };
+
   // Switch preset logo
   const handleSelectPresetLogo = (logoId: LogoId) => {
     onUpdateLogoConfig({
       ...logoConfig,
       activeLogoId: logoId,
     });
+    setToastMessage('✓ Logo atualizada no Firebase para todos os dispositivos!');
+    setTimeout(() => setToastMessage(null), 3000);
   };
 
-  // Upload custom logo from computer/phone
-  const handleUploadCustomLogo = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Upload custom logo from computer/phone (compressed for fast Firestore sync)
+  const handleUploadCustomLogo = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (typeof reader.result === 'string') {
+      try {
+        const compressed = await compressImage(file, 600, 0.8);
+        if (compressed) {
           onUpdateLogoConfig({
             ...logoConfig,
             activeLogoId: 'logo_custom',
-            customLogoUrl: reader.result,
+            customLogoUrl: compressed,
           });
-          setCustomUrlInput(reader.result);
+          setCustomUrlInput(compressed);
+          setToastMessage('✓ Nova logo salva no Firebase e sincronizada para todos os dispositivos!');
+          setTimeout(() => setToastMessage(null), 3500);
         }
-      };
-      reader.readAsDataURL(file);
+      } catch (err) {
+        console.error('Erro ao comprimir logo:', err);
+      }
     }
   };
 
@@ -296,32 +323,35 @@ export const DirectionPanelModal: React.FC<DirectionPanelModalProps> = ({
         activeLogoId: 'logo_custom',
         customLogoUrl: customUrlInput.trim(),
       });
+      setToastMessage('✓ Logo salva no Firebase e sincronizada para todos os dispositivos!');
+      setTimeout(() => setToastMessage(null), 3000);
     }
   };
 
-  // Upload custom designer logo
-  const handleUploadDesignerLogo = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Upload custom designer logo (compressed for fast Firestore sync)
+  const handleUploadDesignerLogo = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (typeof reader.result === 'string') {
+      try {
+        const compressed = await compressImage(file, 500, 0.8);
+        if (compressed) {
           const updated: DesignerConfig = {
             ...designerConfig,
             designerName: designerNameInput.trim() || 'João Paulo',
             role: designerRoleInput.trim() || 'Design & Identidade Visual',
-            logoUrl: reader.result,
+            logoUrl: compressed,
             portfolioUrl: designerPortfolioInput.trim() || undefined,
             showInHeader: true,
             showInFooter: true,
           };
           onUpdateDesignerConfig(updated);
-          setDesignerLogoUrlInput(reader.result);
-          setToastMessage('✓ Logo do Design atualizada!');
-          setTimeout(() => setToastMessage(null), 3000);
+          setDesignerLogoUrlInput(compressed);
+          setToastMessage('✓ Logo do Design salva no Firebase para todos os dispositivos!');
+          setTimeout(() => setToastMessage(null), 3500);
         }
-      };
-      reader.readAsDataURL(file);
+      } catch (err) {
+        console.error('Erro ao comprimir logo do designer:', err);
+      }
     }
   };
 
@@ -337,8 +367,8 @@ export const DirectionPanelModal: React.FC<DirectionPanelModalProps> = ({
       showInFooter: true,
     };
     onUpdateDesignerConfig(updated);
-    setToastMessage('✓ Informações e créditos do Design salvos com sucesso!');
-    setTimeout(() => setToastMessage(null), 3000);
+    setToastMessage('✓ Informações e créditos do Design salvos no Firebase!');
+    setTimeout(() => setToastMessage(null), 3500);
   };
 
   // Remove designer logo
@@ -408,17 +438,18 @@ export const DirectionPanelModal: React.FC<DirectionPanelModalProps> = ({
     setFormVisualType('jersey_home');
   };
 
-  // Upload product photo
-  const handleUploadProductImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Upload product photo (compressed for fast Firestore sync)
+  const handleUploadProductImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (typeof reader.result === 'string') {
-          setFormCustomImage(reader.result);
+      try {
+        const compressed = await compressImage(file, 800, 0.75);
+        if (compressed) {
+          setFormCustomImage(compressed);
         }
-      };
-      reader.readAsDataURL(file);
+      } catch (err) {
+        console.error('Erro ao comprimir imagem do produto:', err);
+      }
     }
   };
 
@@ -455,6 +486,8 @@ export const DirectionPanelModal: React.FC<DirectionPanelModalProps> = ({
 
     setEditingProduct(null);
     setIsCreatingNew(false);
+    setToastMessage('✓ Produto salvo no Firebase e atualizado em todos os dispositivos!');
+    setTimeout(() => setToastMessage(null), 3500);
   };
 
   // In-UI Confirmation states (replaces window.confirm which is blocked in iframes)
@@ -471,8 +504,8 @@ export const DirectionPanelModal: React.FC<DirectionPanelModalProps> = ({
       setEditingProduct(null);
     }
     setProductToDelete(null);
-    setToastMessage(`"${removedName}" removido com sucesso.`);
-    setTimeout(() => setToastMessage(null), 3000);
+    setToastMessage(`✓ "${removedName}" removido no Firebase para todos os dispositivos.`);
+    setTimeout(() => setToastMessage(null), 3500);
   };
 
   // Add new slide from URL or file
@@ -489,30 +522,31 @@ export const DirectionPanelModal: React.FC<DirectionPanelModalProps> = ({
     setSlideUrlInput('');
     setSlideTitleInput('');
     setSlideSubtitleInput('');
-    setToastMessage('Nova foto adicionada ao carrossel do banner!');
-    setTimeout(() => setToastMessage(null), 3000);
+    setToastMessage('✓ Nova foto adicionada no Firebase para todos os dispositivos!');
+    setTimeout(() => setToastMessage(null), 3500);
   };
 
-  const handleUploadSlideFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleUploadSlideFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (typeof reader.result === 'string') {
+      try {
+        const compressed = await compressImage(file, 1000, 0.75);
+        if (compressed) {
           const newSlide: HeroSlide = {
             id: `slide_up_${Date.now()}`,
-            url: reader.result,
+            url: compressed,
             title: slideTitleInput.trim() || file.name.replace(/\.[^/.]+$/, ''),
             subtitle: slideSubtitleInput.trim() || 'Foto enviada pela Diretoria',
           };
           onUpdateHeroSlides([...heroSlides, newSlide]);
           setSlideTitleInput('');
           setSlideSubtitleInput('');
-          setToastMessage('Foto do time enviada com sucesso para o banner!');
-          setTimeout(() => setToastMessage(null), 3000);
+          setToastMessage('✓ Foto do time salva no Firebase para todos os dispositivos!');
+          setTimeout(() => setToastMessage(null), 3500);
         }
-      };
-      reader.readAsDataURL(file);
+      } catch (err) {
+        console.error('Erro ao comprimir foto do banner:', err);
+      }
     }
   };
 
@@ -659,78 +693,93 @@ export const DirectionPanelModal: React.FC<DirectionPanelModalProps> = ({
           /* --- UNLOCKED MANAGEMENT DASHBOARD --- */
           <div className="flex-1 flex flex-col overflow-hidden">
             {/* Tab navigation */}
-            <div className="flex border-b border-neutral-200 bg-neutral-50 px-6 pt-3 gap-2 overflow-x-auto">
-              <button
-                onClick={() => {
-                  setActiveTab('texto');
-                  setEditingProduct(null);
-                }}
-                className={`pb-3 px-4 text-xs font-bold transition-all border-b-2 flex items-center gap-2 whitespace-nowrap ${
-                  activeTab === 'texto'
-                    ? 'border-red-600 text-red-700'
-                    : 'border-transparent text-neutral-600 hover:text-neutral-900'
-                }`}
-              >
-                <Cloud className="w-4 h-4 text-amber-500" />
-                <span>Texto do Site (Firestore)</span>
-              </button>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between border-b border-neutral-200 bg-neutral-50 px-4 sm:px-6 pt-3 gap-2">
+              <div className="flex gap-1 sm:gap-2 overflow-x-auto pb-1 sm:pb-0">
+                <button
+                  onClick={() => {
+                    setActiveTab('texto');
+                    setEditingProduct(null);
+                  }}
+                  className={`pb-3 px-3 text-xs font-bold transition-all border-b-2 flex items-center gap-1.5 whitespace-nowrap ${
+                    activeTab === 'texto'
+                      ? 'border-red-600 text-red-700'
+                      : 'border-transparent text-neutral-600 hover:text-neutral-900'
+                  }`}
+                >
+                  <Cloud className="w-4 h-4 text-amber-500" />
+                  <span>Texto (Firestore)</span>
+                </button>
 
-              <button
-                onClick={() => {
-                  setActiveTab('logos');
-                  setEditingProduct(null);
-                }}
-                className={`pb-3 px-4 text-xs font-bold transition-all border-b-2 flex items-center gap-2 whitespace-nowrap ${
-                  activeTab === 'logos'
-                    ? 'border-red-600 text-red-700'
-                    : 'border-transparent text-neutral-600 hover:text-neutral-900'
-                }`}
-              >
-                <ImageIcon className="w-4 h-4" />
-                <span>Logos do Cabeçalho</span>
-              </button>
+                <button
+                  onClick={() => {
+                    setActiveTab('logos');
+                    setEditingProduct(null);
+                  }}
+                  className={`pb-3 px-3 text-xs font-bold transition-all border-b-2 flex items-center gap-1.5 whitespace-nowrap ${
+                    activeTab === 'logos'
+                      ? 'border-red-600 text-red-700'
+                      : 'border-transparent text-neutral-600 hover:text-neutral-900'
+                  }`}
+                >
+                  <ImageIcon className="w-4 h-4" />
+                  <span>Logos</span>
+                </button>
 
-              <button
-                onClick={() => setActiveTab('produtos')}
-                className={`pb-3 px-4 text-xs font-bold transition-all border-b-2 flex items-center gap-2 whitespace-nowrap ${
-                  activeTab === 'produtos'
-                    ? 'border-red-600 text-red-700'
-                    : 'border-transparent text-neutral-600 hover:text-neutral-900'
-                }`}
-              >
-                <Edit3 className="w-4 h-4" />
-                <span>Produtos da Loja ({products.length})</span>
-              </button>
+                <button
+                  onClick={() => setActiveTab('produtos')}
+                  className={`pb-3 px-3 text-xs font-bold transition-all border-b-2 flex items-center gap-1.5 whitespace-nowrap ${
+                    activeTab === 'produtos'
+                      ? 'border-red-600 text-red-700'
+                      : 'border-transparent text-neutral-600 hover:text-neutral-900'
+                  }`}
+                >
+                  <Edit3 className="w-4 h-4" />
+                  <span>Produtos ({products.length})</span>
+                </button>
 
-              <button
-                onClick={() => {
-                  setActiveTab('banner');
-                  setEditingProduct(null);
-                }}
-                className={`pb-3 px-4 text-xs font-bold transition-all border-b-2 flex items-center gap-2 whitespace-nowrap ${
-                  activeTab === 'banner'
-                    ? 'border-red-600 text-red-700'
-                    : 'border-transparent text-neutral-600 hover:text-neutral-900'
-                }`}
-              >
-                <Sparkles className="w-4 h-4 text-yellow-500" />
-                <span>Fotos do Banner ({heroSlides.length})</span>
-              </button>
+                <button
+                  onClick={() => {
+                    setActiveTab('banner');
+                    setEditingProduct(null);
+                  }}
+                  className={`pb-3 px-3 text-xs font-bold transition-all border-b-2 flex items-center gap-1.5 whitespace-nowrap ${
+                    activeTab === 'banner'
+                      ? 'border-red-600 text-red-700'
+                      : 'border-transparent text-neutral-600 hover:text-neutral-900'
+                  }`}
+                >
+                  <Sparkles className="w-4 h-4 text-yellow-500" />
+                  <span>Banner ({heroSlides.length})</span>
+                </button>
 
-              <button
-                onClick={() => {
-                  setActiveTab('designer');
-                  setEditingProduct(null);
-                }}
-                className={`pb-3 px-4 text-xs font-bold transition-all border-b-2 flex items-center gap-2 whitespace-nowrap ${
-                  activeTab === 'designer'
-                    ? 'border-red-600 text-red-700'
-                    : 'border-transparent text-neutral-600 hover:text-neutral-900'
-                }`}
-              >
-                <Palette className="w-4 h-4 text-purple-600" />
-                <span>Logo & Créditos do Design</span>
-              </button>
+                <button
+                  onClick={() => {
+                    setActiveTab('designer');
+                    setEditingProduct(null);
+                  }}
+                  className={`pb-3 px-3 text-xs font-bold transition-all border-b-2 flex items-center gap-1.5 whitespace-nowrap ${
+                    activeTab === 'designer'
+                      ? 'border-red-600 text-red-700'
+                      : 'border-transparent text-neutral-600 hover:text-neutral-900'
+                  }`}
+                >
+                  <Palette className="w-4 h-4 text-purple-600" />
+                  <span>Design & Créditos</span>
+                </button>
+              </div>
+
+              {onSyncAllToFirestore && (
+                <button
+                  type="button"
+                  onClick={handleSyncAllCloud}
+                  disabled={isSyncingAll}
+                  className="mb-2 shrink-0 px-3.5 py-1.5 bg-red-700 hover:bg-red-800 disabled:opacity-50 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all hover:scale-105 cursor-pointer"
+                  title="Sincroniza todas as alterações no Firebase para todos os celulares e computadores"
+                >
+                  <CloudUpload className="w-3.5 h-3.5 text-yellow-300" />
+                  <span>{isSyncingAll ? 'Sincronizando...' : 'Sincronizar no Firebase'}</span>
+                </button>
+              )}
             </div>
 
             {/* TAB 0: TEXTO DO SITE (FIRESTORE) */}

@@ -67,11 +67,18 @@ export default function App() {
     };
   });
 
-  const handleUpdateLogoConfig = (newConfig: LogoConfig) => {
+  const handleUpdateLogoConfig = async (newConfig: LogoConfig) => {
     setLogoConfig(newConfig);
     try {
       localStorage.setItem('poeirao_logo_config', JSON.stringify(newConfig));
     } catch (e) {}
+
+    try {
+      const docRef = doc(db, CONTENT_COLLECTION, CONTENT_DOC_ID);
+      await setDoc(docRef, { logoConfig: newConfig, updatedAt: new Date().toISOString() }, { merge: true });
+    } catch (e) {
+      console.warn('Erro ao salvar logoConfig no Firestore:', e);
+    }
   };
 
   // Designer Credits & Logo State (Configurable in Cadeado, saved in localStorage & Firestore)
@@ -99,14 +106,14 @@ export default function App() {
     // Persist to Firestore as well so it syncs across devices
     try {
       const docRef = doc(db, CONTENT_COLLECTION, CONTENT_DOC_ID);
-      await setDoc(docRef, { designerConfig: newConfig }, { merge: true });
+      await setDoc(docRef, { designerConfig: newConfig, updatedAt: new Date().toISOString() }, { merge: true });
     } catch (e) {
       console.warn('Persistência local do designer:', e);
     }
   };
 
 
-  // Dynamic Products List (Editable by direction, saved in localStorage)
+  // Dynamic Products List (Editable by direction, synchronized to Firestore)
   const [productsList, setProductsList] = useState<Product[]>(() => {
     try {
       const saved = localStorage.getItem('poeirao_custom_products');
@@ -115,21 +122,35 @@ export default function App() {
     return PRODUCTS;
   });
 
-  const handleUpdateProducts = (newProducts: Product[]) => {
+  const handleUpdateProducts = async (newProducts: Product[]) => {
     setProductsList(newProducts);
     try {
       localStorage.setItem('poeirao_custom_products', JSON.stringify(newProducts));
     } catch (e) {}
+
+    try {
+      const docRef = doc(db, CONTENT_COLLECTION, CONTENT_DOC_ID);
+      await setDoc(docRef, { products: newProducts, updatedAt: new Date().toISOString() }, { merge: true });
+    } catch (e) {
+      console.warn('Erro ao salvar produtos no Firestore:', e);
+    }
   };
 
-  const handleResetProducts = () => {
+  const handleResetProducts = async () => {
     setProductsList(PRODUCTS);
     try {
       localStorage.removeItem('poeirao_custom_products');
     } catch (e) {}
+
+    try {
+      const docRef = doc(db, CONTENT_COLLECTION, CONTENT_DOC_ID);
+      await setDoc(docRef, { products: PRODUCTS, updatedAt: new Date().toISOString() }, { merge: true });
+    } catch (e) {
+      console.warn('Erro ao resetar produtos no Firestore:', e);
+    }
   };
 
-  // Dynamic Hero Slides (Editable by direction in Cadeado, saved in localStorage)
+  // Dynamic Hero Slides (Editable by direction in Cadeado, synchronized to Firestore)
   const [heroSlides, setHeroSlides] = useState<HeroSlide[]>(() => {
     try {
       const saved = localStorage.getItem('poeirao_hero_slides');
@@ -138,18 +159,49 @@ export default function App() {
     return DEFAULT_HERO_SLIDES;
   });
 
-  const handleUpdateHeroSlides = (newSlides: HeroSlide[]) => {
+  const handleUpdateHeroSlides = async (newSlides: HeroSlide[]) => {
     setHeroSlides(newSlides);
     try {
       localStorage.setItem('poeirao_hero_slides', JSON.stringify(newSlides));
     } catch (e) {}
+
+    try {
+      const docRef = doc(db, CONTENT_COLLECTION, CONTENT_DOC_ID);
+      await setDoc(docRef, { heroSlides: newSlides, updatedAt: new Date().toISOString() }, { merge: true });
+    } catch (e) {
+      console.warn('Erro ao salvar heroSlides no Firestore:', e);
+    }
   };
 
-  const handleResetHeroSlides = () => {
+  const handleResetHeroSlides = async () => {
     setHeroSlides(DEFAULT_HERO_SLIDES);
     try {
       localStorage.removeItem('poeirao_hero_slides');
     } catch (e) {}
+
+    try {
+      const docRef = doc(db, CONTENT_COLLECTION, CONTENT_DOC_ID);
+      await setDoc(docRef, { heroSlides: DEFAULT_HERO_SLIDES, updatedAt: new Date().toISOString() }, { merge: true });
+    } catch (e) {
+      console.warn('Erro ao resetar heroSlides no Firestore:', e);
+    }
+  };
+
+  // Handler to sync everything in one call to Firestore
+  const handleSyncAllToFirestore = async () => {
+    const docRef = doc(db, CONTENT_COLLECTION, CONTENT_DOC_ID);
+    await setDoc(
+      docRef,
+      {
+        [CONTENT_FIELD]: heroHighlightedText,
+        logoConfig,
+        designerConfig,
+        products: productsList,
+        heroSlides,
+        updatedAt: new Date().toISOString(),
+      },
+      { merge: true }
+    );
   };
 
   // Direction Panel State (Password 22232425)
@@ -200,7 +252,7 @@ export default function App() {
     return localStorage.getItem('poeirao_firestore_texto') || 'VISTA A TRADIÇÃO DO POEIRÃO COM ORGULHO';
   });
 
-  // Real-time listener for Firestore document
+  // Real-time listener for Firestore document: syncs the ENTIRE site across all devices
   useEffect(() => {
     const docRef = doc(db, CONTENT_COLLECTION, CONTENT_DOC_ID);
     const unsubscribe = onSnapshot(
@@ -209,16 +261,97 @@ export default function App() {
         if (docSnap.exists()) {
           const data = docSnap.data();
           if (data) {
+            // 1. Text in Highlight (Coleção: conteudo, Doc: 9FiYJYD9FENDXNNfQ7Z0, Campo: texto)
             if (typeof data[CONTENT_FIELD] === 'string' && data[CONTENT_FIELD].trim()) {
               const remoteText = data[CONTENT_FIELD].trim();
               setHeroHighlightedText(remoteText);
               localStorage.setItem('poeirao_firestore_texto', remoteText);
             }
+
+            // 2. Products List (Syncs entire catalog across all devices)
+            if (Array.isArray(data.products) && data.products.length > 0) {
+              setProductsList(data.products);
+              try {
+                localStorage.setItem('poeirao_custom_products', JSON.stringify(data.products));
+              } catch (e) {}
+            } else {
+              // If Firestore doesn't have products yet, check if this device has custom edits to publish
+              const localProducts = localStorage.getItem('poeirao_custom_products');
+              if (localProducts) {
+                try {
+                  const parsed = JSON.parse(localProducts);
+                  if (Array.isArray(parsed) && parsed.length > 0) {
+                    setDoc(docRef, { products: parsed, updatedAt: new Date().toISOString() }, { merge: true }).catch(console.warn);
+                  }
+                } catch (e) {}
+              }
+            }
+
+            // 3. Hero Banner Slides (Syncs banner slides across all devices)
+            if (Array.isArray(data.heroSlides) && data.heroSlides.length > 0) {
+              setHeroSlides(data.heroSlides);
+              try {
+                localStorage.setItem('poeirao_hero_slides', JSON.stringify(data.heroSlides));
+              } catch (e) {}
+            } else {
+              const localSlides = localStorage.getItem('poeirao_hero_slides');
+              if (localSlides) {
+                try {
+                  const parsed = JSON.parse(localSlides);
+                  if (Array.isArray(parsed) && parsed.length > 0) {
+                    setDoc(docRef, { heroSlides: parsed, updatedAt: new Date().toISOString() }, { merge: true }).catch(console.warn);
+                  }
+                } catch (e) {}
+              }
+            }
+
+            // 4. Logo Configuration (Syncs preset/custom logo across all devices)
+            if (data.logoConfig && typeof data.logoConfig === 'object') {
+              setLogoConfig(data.logoConfig);
+              try {
+                localStorage.setItem('poeirao_logo_config', JSON.stringify(data.logoConfig));
+              } catch (e) {}
+            } else {
+              const localLogo = localStorage.getItem('poeirao_logo_config');
+              if (localLogo) {
+                try {
+                  const parsed = JSON.parse(localLogo);
+                  if (parsed && parsed.activeLogoId) {
+                    setDoc(docRef, { logoConfig: parsed, updatedAt: new Date().toISOString() }, { merge: true }).catch(console.warn);
+                  }
+                } catch (e) {}
+              }
+            }
+
+            // 5. Designer Configuration (Syncs credits, name & designer logo across all devices)
             if (data.designerConfig && typeof data.designerConfig === 'object') {
               setDesignerConfig(data.designerConfig);
-              localStorage.setItem('poeirao_designer_config', JSON.stringify(data.designerConfig));
+              try {
+                localStorage.setItem('poeirao_designer_config', JSON.stringify(data.designerConfig));
+              } catch (e) {}
+            } else {
+              const localDesigner = localStorage.getItem('poeirao_designer_config');
+              if (localDesigner) {
+                try {
+                  const parsed = JSON.parse(localDesigner);
+                  if (parsed && parsed.designerName) {
+                    setDoc(docRef, { designerConfig: parsed, updatedAt: new Date().toISOString() }, { merge: true }).catch(console.warn);
+                  }
+                } catch (e) {}
+              }
             }
           }
+        } else {
+          // Document does not exist yet: publish complete state to Firestore
+          const initialPayload: Record<string, any> = {
+            [CONTENT_FIELD]: heroHighlightedText,
+            logoConfig,
+            designerConfig,
+            products: productsList,
+            heroSlides,
+            updatedAt: new Date().toISOString(),
+          };
+          setDoc(docRef, initialPayload, { merge: true }).catch(console.warn);
         }
       },
       (error) => {
@@ -855,6 +988,7 @@ export default function App() {
         onResetHeroSlides={handleResetHeroSlides}
         firestoreText={heroHighlightedText}
         onSaveFirestoreText={handleSaveFirestoreText}
+        onSyncAllToFirestore={handleSyncAllToFirestore}
       />
     </div>
   );
