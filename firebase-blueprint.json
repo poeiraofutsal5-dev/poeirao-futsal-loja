@@ -1,0 +1,32 @@
+{
+  "entities": {
+    "Conteudo": {
+      "title": "Conteudo",
+      "description": "Conteúdo e textos dinâmicos da Loja Oficial do Poeirão salvos no Firestore",
+      "type": "object",
+      "properties": {
+        "texto": {
+          "type": "string",
+          "description": "Texto em destaque exibido em tempo real na página inicial"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Data e hora ISO da última alteração"
+        },
+        "updatedBy": {
+          "type": "string",
+          "description": "E-mail do administrador autenticado que efetuou a alteração"
+        }
+      },
+      "required": [
+        "texto"
+      ]
+    }
+  },
+  "firestore": {
+    "/conteudo/{documentId}": {
+      "schema": "Conteudo",
+      "description": "Coleção de conteúdos dinâmicos do site"
+    }
+  }
+}

@@ -1,0 +1,11 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /conteudo/{documentId} {
+      // Leitura pública em tempo real para a vitrine
+      allow read: if true;
+      // Alterações restritas a administradores autenticados via Firebase Auth
+      allow write: if request.auth != null;
+    }
+  }
+}

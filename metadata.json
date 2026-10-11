@@ -1,0 +1,6 @@
+{
+  "name": "Loja Oficial Sócio Poeirão",
+  "description": "Loja oficial de artigos esportivos, camisas oficiais, uniformes de viagem, regatas e calçados do Sócio Poeirão com descontos exclusivos para torcedores associados.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
