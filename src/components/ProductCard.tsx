@@ -36,7 +36,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       onClick={() => onSelectProduct(product)}
     >
       {/* 1. Image Container (Exact clean background style of Image 2) */}
-      <div className="relative w-full aspect-square bg-[#f5f5f5] rounded-xs overflow-hidden flex items-center justify-center p-6 border border-neutral-100/60">
+      <div className="relative w-full aspect-square bg-[#f5f5f5] rounded-xs overflow-hidden flex items-center justify-center p-2.5 sm:p-6 border border-neutral-100/60">
         
         {/* Floating Heart Button (Top Right as in Image 2) */}
         <button
@@ -46,10 +46,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             onToggleFavorite(product.id);
           }}
           aria-label="Adicionar aos favoritos"
-          className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-white/95 hover:bg-white shadow-xs border border-neutral-200/80 flex items-center justify-center transition-transform hover:scale-110 active:scale-95"
+          className="absolute top-1.5 right-1.5 sm:top-3 sm:right-3 z-10 w-6 h-6 sm:w-9 sm:h-9 rounded-full bg-white/95 hover:bg-white shadow-xs border border-neutral-200/80 flex items-center justify-center transition-transform hover:scale-110 active:scale-95"
         >
           <Heart
-            className={`w-4 h-4 transition-colors ${
+            className={`w-3 h-3 sm:w-4 sm:h-4 transition-colors ${
               isFavorite ? 'fill-red-600 text-red-600' : 'text-neutral-700'
             }`}
           />
@@ -66,25 +66,27 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       </div>
 
       {/* 2. Product Details (Faithful to Image 2 typography and spacing) */}
-      <div className="pt-3 pb-1 flex flex-col">
+      <div className="pt-2 sm:pt-3 pb-1 flex flex-col">
         {/* Product Title (Bold clean sans-serif) */}
-        <h3 className="font-bold text-neutral-900 text-sm sm:text-[15px] leading-snug line-clamp-1 group-hover:text-red-700 transition-colors">
+        <h3 className="font-bold text-neutral-900 text-xs sm:text-[15px] leading-snug line-clamp-2 sm:line-clamp-1 group-hover:text-red-700 transition-colors">
           {product.name}
         </h3>
 
-
         {/* Price Row: "R$ 229,99 no Pix   R$ 449,99   49% off" (as in Image 2) */}
-        <div className="flex items-baseline flex-wrap gap-x-2 mt-2">
-          <span className="font-bold text-neutral-900 text-sm sm:text-[15px] tabular-nums">
-            R$ {formatPrice(product.pricePix)} no Pix
+        <div className="flex items-baseline flex-wrap gap-x-1.5 sm:gap-x-2 mt-1 sm:mt-2">
+          <span className="font-bold text-neutral-900 text-xs sm:text-[15px] tabular-nums">
+            R$ {formatPrice(product.pricePix)}
+          </span>
+          <span className="text-[10px] sm:text-xs text-neutral-600 font-normal">
+            no Pix
           </span>
 
           {product.priceOriginal > product.pricePix && (
             <>
-              <span className="text-xs text-neutral-400 line-through tabular-nums">
+              <span className="text-[10px] sm:text-xs text-neutral-400 line-through tabular-nums">
                 R$ {formatPrice(product.priceOriginal)}
               </span>
-              <span className="text-xs font-semibold text-emerald-700 tabular-nums">
+              <span className="text-[10px] sm:text-xs font-semibold text-emerald-700 tabular-nums">
                 {product.discountPercent}% off
               </span>
             </>
@@ -92,28 +94,28 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         </div>
 
         {/* Star Rating & Numerical Box (as in Image 2: 5 stars + [4.3]) */}
-        <div className="flex items-center gap-1.5 mt-2">
+        <div className="flex items-center gap-1 sm:gap-1.5 mt-1 sm:mt-2">
           <div className="flex items-center text-neutral-900">
             {[1, 2, 3, 4, 5].map((star) => (
               <Star
                 key={star}
-                className="w-3.5 h-3.5 fill-neutral-900 text-neutral-900"
+                className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 fill-neutral-900 text-neutral-900"
               />
             ))}
           </div>
           {/* Rating number in neat bordered rectangle (identical to image 2) */}
-          <span className="border border-neutral-300 text-neutral-700 text-[10px] font-semibold px-1 py-0.2 rounded-xs tabular-nums">
+          <span className="border border-neutral-300 text-neutral-700 text-[8px] sm:text-[10px] font-semibold px-1 py-0.2 rounded-xs tabular-nums">
             {product.rating.toFixed(1)}
           </span>
         </div>
 
         {/* Desconto Sócio Gold (30%) */}
-        <p className="text-[11px] font-semibold text-red-700 mt-2 flex items-center gap-1">
-          <Sparkles className="w-3 h-3 text-red-600 shrink-0" />
+        <p className="text-[9px] sm:text-[11px] font-semibold text-red-700 mt-1 sm:mt-2 flex items-center gap-1 leading-tight line-clamp-1">
+          <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-red-600 shrink-0" />
           <span>
             {socioUser.isLoggedIn && socioUser.planName && !socioUser.planName.includes('Gold')
               ? `Desconto Sócio (${Math.round(socioUser.discountRate * 100)}%): R$ ${formatPrice(priceSocio)}`
-              : `Desconto Sócio Gold (30%): R$ ${formatPrice(priceSocio)}`}
+              : `Sócio Gold (30%): R$ ${formatPrice(priceSocio)}`}
           </span>
         </p>
       </div>

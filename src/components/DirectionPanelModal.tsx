@@ -421,7 +421,7 @@ export const DirectionPanelModal: React.FC<DirectionPanelModalProps> = ({
       colors: ['Padrão'],
       inStock: true,
       stockQuantity: 30,
-      visualType: 'jersey_home',
+      visualType: 'none',
       features: ['Tecido Oficial de Alta Performance'],
     };
     setEditingProduct(newProd);
@@ -435,7 +435,7 @@ export const DirectionPanelModal: React.FC<DirectionPanelModalProps> = ({
     setFormInStock(true);
     setFormDescription(newProd.description);
     setFormCustomImage('');
-    setFormVisualType('jersey_home');
+    setFormVisualType('none');
   };
 
   // Upload product photo (compressed for fast Firestore sync)
@@ -1233,45 +1233,133 @@ export const DirectionPanelModal: React.FC<DirectionPanelModalProps> = ({
                       </div>
 
                       {/* Image Management */}
-                      <div className="border border-neutral-200 bg-white p-3.5 rounded-xl space-y-2">
-                        <label className="block font-bold text-xs text-neutral-800">
-                          Imagem do Produto:
-                        </label>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
-                          <div>
-                            <span className="text-[11px] text-neutral-500 block mb-1">
-                              Fazer Upload da Foto do Produto:
-                            </span>
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={handleUploadProductImage}
-                              className="text-xs w-full file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-red-50 file:text-red-700 hover:file:bg-red-100"
-                            />
-                            <div className="mt-2">
-                              <span className="text-[11px] text-neutral-500 block mb-0.5">
-                                Ou Link/URL da Imagem:
+                      <div className="border border-neutral-200 bg-white p-4 rounded-xl space-y-3">
+                        <div className="flex items-center justify-between">
+                          <label className="block font-bold text-xs text-neutral-800">
+                            Foto & Imagem do Produto:
+                          </label>
+                          {formCustomImage && (
+                            <button
+                              type="button"
+                              onClick={() => setFormCustomImage('')}
+                              className="text-xs text-red-600 hover:text-red-700 font-bold flex items-center gap-1 px-2 py-1 bg-red-50 hover:bg-red-100 rounded-md transition-colors"
+                              title="Remover foto e deixar sem imagem"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                              <span>Remover Foto (Lixeira)</span>
+                            </button>
+                          )}
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
+                          <div className="space-y-3">
+                            <div>
+                              <span className="text-[11px] font-semibold text-neutral-600 block mb-1">
+                                Fazer Upload da Foto do Produto:
                               </span>
                               <input
-                                type="url"
-                                placeholder="https://..."
-                                value={formCustomImage}
-                                onChange={(e) => setFormCustomImage(e.target.value)}
-                                className="w-full text-xs p-1.5 border border-neutral-300 rounded"
+                                type="file"
+                                accept="image/*"
+                                onChange={handleUploadProductImage}
+                                className="text-xs w-full file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 cursor-pointer"
                               />
+                            </div>
+
+                            <div>
+                              <span className="text-[11px] font-semibold text-neutral-600 block mb-0.5">
+                                Ou Link Direto / URL da Imagem:
+                              </span>
+                              <div className="flex gap-1.5">
+                                <input
+                                  type="url"
+                                  placeholder="https://..."
+                                  value={formCustomImage}
+                                  onChange={(e) => setFormCustomImage(e.target.value)}
+                                  className="w-full text-xs p-2 border border-neutral-300 rounded-lg focus:ring-1 focus:ring-red-600 focus:outline-none"
+                                />
+                                {formCustomImage && (
+                                  <button
+                                    type="button"
+                                    onClick={() => setFormCustomImage('')}
+                                    className="p-2 text-red-600 hover:bg-red-50 border border-neutral-300 rounded-lg transition-colors"
+                                    title="Limpar link da imagem"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Foto / Ilustração Padrão (Sem foto enviada) */}
+                            <div className="pt-2 border-t border-neutral-100">
+                              <span className="text-[11px] font-semibold text-neutral-600 block mb-1">
+                                Modelo / Ilustração Padrão (quando não houver foto):
+                              </span>
+                              <div className="flex gap-1.5">
+                                <select
+                                  value={formVisualType}
+                                  onChange={(e) => setFormVisualType(e.target.value as Product['visualType'])}
+                                  className="w-full text-xs p-2 border border-neutral-300 rounded-lg bg-white"
+                                >
+                                  <option value="none">❌ Nenhuma (Sem foto padrão / Em branco)</option>
+                                  <option value="jersey_home">Camisa Titular Rubro-Negro Listrada</option>
+                                  <option value="jersey_away">Camisa Reserva Branca</option>
+                                  <option value="jersey_black">Camisa 3 Preta / Treino</option>
+                                  <option value="shoe_sb">Tênis Skate SB Chron</option>
+                                  <option value="shoe_runner">Tênis Running Revolution</option>
+                                  <option value="slide_victori">Chinelo Slide Poeirão</option>
+                                  <option value="jacket_travel">Jaqueta Viagem</option>
+                                  <option value="hoodie_travel">Moletom com Capuz</option>
+                                  <option value="tank_heritage">Regata Tradicional</option>
+                                  <option value="tank_dryfit">Regata Dry-Fit</option>
+                                  <option value="cap_trucker">Boné Trucker</option>
+                                  <option value="backpack">Mochila Oficial</option>
+                                </select>
+                                {formVisualType !== 'none' && (
+                                  <button
+                                    type="button"
+                                    onClick={() => setFormVisualType('none')}
+                                    className="p-2 text-red-600 hover:bg-red-50 border border-neutral-300 rounded-lg transition-colors"
+                                    title="Remover ilustração padrão"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                )}
+                              </div>
+                              {formVisualType !== 'none' && (
+                                <button
+                                  type="button"
+                                  onClick={() => setFormVisualType('none')}
+                                  className="mt-1 text-[11px] text-red-600 hover:text-red-700 font-medium flex items-center gap-1"
+                                >
+                                  <Trash2 className="w-3 h-3" />
+                                  <span>Remover ilustração padrão (deixar limpo)</span>
+                                </button>
+                              )}
                             </div>
                           </div>
 
-                          {/* Image preview */}
-                          <div className="flex flex-col items-center justify-center p-2 bg-neutral-50 border rounded-lg h-32">
-                            <span className="text-[10px] text-neutral-400 mb-1">Pré-visualização:</span>
-                            <div className="max-h-24 max-w-full flex items-center justify-center">
+                          {/* Image preview with quick trash button */}
+                          <div className="relative flex flex-col items-center justify-center p-3 bg-neutral-50 border border-neutral-200 rounded-xl min-h-[140px]">
+                            <span className="text-[10px] text-neutral-400 mb-2 font-medium">Pré-visualização:</span>
+                            <div className="max-h-28 max-w-full flex items-center justify-center">
                               <ProductRender
                                 type={formVisualType}
                                 customImageUrl={formCustomImage || undefined}
-                                className="max-h-20"
+                                className="max-h-24"
                               />
                             </div>
+                            {formCustomImage && (
+                              <button
+                                type="button"
+                                onClick={() => setFormCustomImage('')}
+                                className="absolute top-2 right-2 px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded-md shadow-sm text-[10px] font-bold flex items-center gap-1 transition-colors"
+                                title="Remover foto do produto"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                                <span>Remover Foto</span>
+                              </button>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -1356,6 +1444,22 @@ export const DirectionPanelModal: React.FC<DirectionPanelModalProps> = ({
                         </div>
 
                         <div className="flex items-center gap-1.5 shrink-0">
+                          {prod.customImageUrl && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const updated = { ...prod, customImageUrl: undefined };
+                                onUpdateProducts(products.map((p) => (p.id === prod.id ? updated : p)));
+                                setToastMessage(`✓ Foto removida de "${prod.name}".`);
+                                setTimeout(() => setToastMessage(null), 3000);
+                              }}
+                              className="px-2 py-1.5 text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors"
+                              title="Remover foto do produto"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                              <span className="hidden md:inline text-[11px]">Remover Foto</span>
+                            </button>
+                          )}
                           <button
                             type="button"
                             onClick={() => handleOpenEditProduct(prod)}

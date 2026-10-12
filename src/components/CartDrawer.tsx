@@ -58,7 +58,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 
   // Build WhatsApp Message with Number, Name and Size for each item as requested
   const handleCheckoutWhatsApp = () => {
-    const phoneTeam = '5511999999999'; // WhatsApp oficial do time Poeirão
+    const phoneTeam = '5577981677054'; // WhatsApp oficial do time Poeirão: (77) 98167-7054
     
     let message = `🔴⚫ *NOVO PEDIDO - LOJA OFICIAL SÓCIO POEIRÃO*\n\n`;
     
@@ -95,8 +95,24 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
     message += `Gostaria de confirmar meu pedido e combinar o pagamento (Pix ou Cartão)! Aguardo retorno.`;
 
     const encoded = encodeURIComponent(message);
-    const whatsappUrl = `https://api.whatsapp.com/send?phone=${phoneTeam}&text=${encoded}`;
-    window.open(whatsappUrl, '_blank');
+    const whatsappUrl = `https://wa.me/${phoneTeam}?text=${encoded}`;
+
+    // Reliable link trigger across mobile & desktop browsers
+    try {
+      const link = document.createElement('a');
+      link.href = whatsappUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      document.body.appendChild(link);
+      link.click();
+      setTimeout(() => {
+        if (document.body.contains(link)) {
+          document.body.removeChild(link);
+        }
+      }, 300);
+    } catch {
+      window.location.href = whatsappUrl;
+    }
   };
 
   return (
@@ -327,11 +343,12 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 
             {/* Botão Finalizar Compra via WhatsApp com Nome, Número e Tamanho (Requested by user) */}
             <button
+              type="button"
               onClick={handleCheckoutWhatsApp}
-              className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#25D366] hover:bg-[#20bd5a] text-white text-sm font-bold rounded-lg shadow-md transition-all active:scale-98"
+              className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#25D366] hover:bg-[#20bd5a] text-white text-sm font-bold rounded-lg shadow-md transition-all active:scale-98 cursor-pointer"
             >
               <MessageCircle className="w-5 h-5 fill-white text-white" />
-              <span>Finalizar Pedido no WhatsApp do Time</span>
+              <span>Finalizar Pedido no WhatsApp</span>
             </button>
 
             <div className="flex items-center justify-center gap-2 text-[10px] text-neutral-500">

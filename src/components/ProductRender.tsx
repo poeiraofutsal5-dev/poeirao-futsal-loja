@@ -9,23 +9,36 @@ interface ProductRenderProps {
 }
 
 export const ProductRender: React.FC<ProductRenderProps> = ({ type, customImageUrl, className = '', isHovered = false }) => {
+  const hasCustomImage = Boolean(customImageUrl && customImageUrl.trim().length > 0);
+
   return (
     <div
       className={`relative w-full h-full flex items-center justify-center transition-transform duration-300 ease-out select-none ${
         isHovered ? 'scale-105' : 'scale-100'
       } ${className}`}
     >
-      {/* Custom image uploaded by board */}
-      {customImageUrl && (
+      {/* Custom image uploaded by board - renders EXCLUSIVELY, never overlapping with default graphics */}
+      {hasCustomImage ? (
         <img
           src={customImageUrl}
           alt="Produto"
           className="max-h-56 max-w-full object-contain drop-shadow-md rounded"
+          onError={(e) => {
+            (e.target as HTMLElement).style.display = 'none';
+          }}
         />
-      )}
-
-      {/* 1. SB Chron Skateboarding Shoe (Direct match for Image 2, Item 1) */}
-      {!customImageUrl && type === 'shoe_sb' && (
+      ) : type === 'none' || !type ? (
+        /* Clean placeholder when no default graphic is selected */
+        <div className="flex flex-col items-center justify-center text-neutral-300 p-4 text-center">
+          <svg className="w-14 h-14 mb-1 text-neutral-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <span className="text-[10px] font-medium text-neutral-400">Sem foto adicionada</span>
+        </div>
+      ) : (
+        <>
+          {/* 1. SB Chron Skateboarding Shoe (Direct match for Image 2, Item 1) */}
+          {type === 'shoe_sb' && (
         <svg viewBox="0 0 500 280" className="w-full h-auto drop-shadow-md max-h-56">
           <defs>
             <linearGradient id="sbCanvasGrad" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -567,6 +580,8 @@ export const ProductRender: React.FC<ProductRenderProps> = ({ type, customImageU
             PFC
           </text>
         </svg>
+      )}
+        </>
       )}
     </div>
   );

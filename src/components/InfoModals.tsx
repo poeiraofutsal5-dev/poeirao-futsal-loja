@@ -182,9 +182,10 @@ export const InfoModal: React.FC<InfoModalProps> = ({ type, isOpen, onClose }) =
                       placeholder="Como podemos te ajudar hoje?"
                     ></textarea>
                   </div>
+
                   <div className="flex items-center justify-between text-xs text-neutral-500 pt-1">
-                    <span className="flex items-center gap-1">
-                      <Phone className="w-3.5 h-3.5 text-neutral-700" /> (11) 4004-7632
+                    <span className="flex items-center gap-1 font-semibold text-neutral-800">
+                      <Phone className="w-3.5 h-3.5 text-emerald-600" /> (77) 98167-7054
                     </span>
                     <span className="flex items-center gap-1">
                       <Mail className="w-3.5 h-3.5 text-neutral-700" /> loja@sociopoeirao.com.br
@@ -192,9 +193,9 @@ export const InfoModal: React.FC<InfoModalProps> = ({ type, isOpen, onClose }) =
                   </div>
                   <button
                     type="submit"
-                    className="w-full py-2.5 bg-[#b91c1c] hover:bg-[#991b1b] text-white font-bold rounded-lg transition-all"
+                    className="w-full py-2.5 bg-neutral-900 hover:bg-neutral-800 text-white font-bold rounded-lg text-xs transition-all"
                   >
-                    Enviar Mensagem à Diretoria da Loja
+                    Enviar Mensagem por E-mail
                   </button>
                 </form>
               )}

@@ -230,15 +230,7 @@ export default function App() {
   const [showOnlyFavorites, setShowOnlyFavorites] = useState<boolean>(false);
 
   // Cart state
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-    {
-      id: 'demo-cart-1',
-      product: PRODUCTS[0], // Tênis SB Chron 2
-      selectedSize: '41',
-      selectedColor: 'Preto/Branco',
-      quantity: 1,
-    },
-  ]);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
   // Modal states
@@ -504,8 +496,8 @@ export default function App() {
       />
 
       {/* 2. Top Promotional Ticker Strip */}
-      <div className="bg-neutral-900 text-white text-xs py-2 px-4 border-b border-neutral-800">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 overflow-x-auto whitespace-nowrap text-center">
+      <div className="bg-neutral-900 text-white text-[11px] sm:text-xs py-1.5 sm:py-2 px-3 sm:px-4 border-b border-neutral-800">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 overflow-x-auto whitespace-nowrap text-center no-scrollbar">
           <div className="flex items-center gap-2 mx-auto">
             <span className="text-[#facc15] font-bold">★ SÓCIO POEIRÃO:</span>
             <span className="text-neutral-300">
@@ -516,7 +508,7 @@ export default function App() {
               href="https://sitepoeirao.com.br"
               target="_blank"
               rel="noopener noreferrer"
-              className="ml-3 underline font-bold text-yellow-400 hover:text-white"
+              className="ml-2 underline font-bold text-yellow-400 hover:text-white"
             >
               Seja Sócio Aqui →
             </a>
@@ -529,8 +521,8 @@ export default function App() {
         </div>
       </div>
 
-      {/* 3. Hero Campaign Showcase (Com fonte amarela e imagens do time passando de fundo) */}
-      <section className="relative overflow-hidden bg-neutral-950 border-b border-neutral-800 text-white min-h-[420px]">
+      {/* 3. Hero Campaign Showcase - Altura ampliada e frase destacada conforme solicitado (imagem 1) */}
+      <section className="relative overflow-hidden bg-neutral-950 border-b border-neutral-800 text-white min-h-[210px] sm:min-h-[340px] lg:min-h-[400px] flex items-center">
         {/* Dynamic Background Slides Carousel (Imagens do time passando de fundo) */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden select-none">
           {heroSlides.map((slide, idx) => {
@@ -547,7 +539,7 @@ export default function App() {
                 <img
                   src={slide.url}
                   alt={slide.title}
-                  className="w-full h-full object-cover object-center filter brightness-[0.38] contrast-125"
+                  className="w-full h-full object-cover object-center filter brightness-[0.45] contrast-125"
                 />
               </div>
             );
@@ -558,16 +550,16 @@ export default function App() {
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/40" />
         </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-          <div className="max-w-3xl space-y-6">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-7 sm:py-16 w-full">
+          <div className="max-w-3xl space-y-2 sm:space-y-4">
             {/* Frase em destaque com FONTE AMARELA conectada ao Firestore em tempo real */}
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-yellow-400 tracking-tight leading-tight font-display drop-shadow-[0_2px_14px_rgba(0,0,0,0.95)]">
+            <h1 className="text-xl sm:text-4xl lg:text-5xl font-black text-yellow-400 tracking-tight leading-snug font-display drop-shadow-[0_2px_14px_rgba(0,0,0,0.95)]">
               {heroHighlightedText}
             </h1>
 
             {/* Subtle Carousel Indicators */}
             {heroSlides.length > 1 && (
-              <div className="flex items-center gap-2 pt-2">
+              <div className="flex items-center gap-1.5 sm:gap-2 pt-1 sm:pt-2">
                 {heroSlides.map((slide, idx) => {
                   const activeIdx = currentSlideIndex % heroSlides.length;
                   return (
@@ -575,8 +567,8 @@ export default function App() {
                       key={slide.id || idx}
                       type="button"
                       onClick={() => setCurrentSlideIndex(idx)}
-                      className={`h-1.5 rounded-full transition-all cursor-pointer ${
-                        idx === activeIdx ? 'w-8 bg-yellow-400' : 'w-2 bg-white/40 hover:bg-white/70'
+                      className={`h-1.5 sm:h-2 rounded-full transition-all cursor-pointer ${
+                        idx === activeIdx ? 'w-6 sm:w-10 bg-yellow-400' : 'w-2 sm:w-2.5 bg-white/40 hover:bg-white/70'
                       }`}
                       aria-label={`Slide ${idx + 1}`}
                     />
@@ -588,10 +580,10 @@ export default function App() {
         </div>
       </section>
 
-      {/* 4. Category Tabs (Requested by user: "separar a loja por itens(camisas oficiais, uniforme de viagem, regatas, caçados...)") */}
-      <nav className="sticky top-[102px] z-30 bg-white/95 backdrop-blur-md border-b border-neutral-200 shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between gap-4 py-2.5 overflow-x-auto no-scrollbar">
+      {/* 4. Category Tabs */}
+      <nav className="sticky top-[75px] sm:top-[102px] z-30 bg-white/95 backdrop-blur-md border-b border-neutral-200 shadow-xs">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between gap-2.5 sm:gap-4 py-2 sm:py-2.5 overflow-x-auto no-scrollbar">
             
             {/* Category Segmented Buttons */}
             <div className="flex items-center gap-1.5 shrink-0">
@@ -605,7 +597,7 @@ export default function App() {
                       setSelectedCategory(cat.id);
                       setShowOnlyFavorites(false);
                     }}
-                    className={`px-3.5 py-2 text-xs font-bold rounded-lg transition-all whitespace-nowrap flex items-center gap-1.5 ${
+                    className={`px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-[11px] sm:text-xs font-bold rounded-lg transition-all whitespace-nowrap flex items-center gap-1 sm:gap-1.5 ${
                       isActive
                         ? 'bg-[#b91c1c] text-white shadow-xs'
                         : 'bg-neutral-100 hover:bg-neutral-200 text-neutral-700 hover:text-neutral-900'
@@ -613,7 +605,7 @@ export default function App() {
                   >
                     <span>{cat.label}</span>
                     <span
-                      className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                      className={`text-[9px] sm:text-[10px] px-1 sm:px-1.5 py-0.2 rounded-full font-bold ${
                         isActive ? 'bg-red-900 text-white' : 'bg-neutral-200 text-neutral-600'
                       }`}
                     >
@@ -626,7 +618,7 @@ export default function App() {
               {/* Wishlist toggle */}
               <button
                 onClick={() => setShowOnlyFavorites(!showOnlyFavorites)}
-                className={`px-3.5 py-2 text-xs font-bold rounded-lg transition-all whitespace-nowrap flex items-center gap-1.5 ${
+                className={`px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-[11px] sm:text-xs font-bold rounded-lg transition-all whitespace-nowrap flex items-center gap-1 sm:gap-1.5 ${
                   showOnlyFavorites
                     ? 'bg-red-700 text-white shadow-xs'
                     : 'bg-neutral-100 hover:bg-neutral-200 text-neutral-700'
@@ -638,12 +630,12 @@ export default function App() {
             </div>
 
             {/* Sort & Quick Filter Selector */}
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
               <span className="text-xs text-neutral-500 font-medium hidden sm:inline">Ordenar:</span>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="text-xs font-semibold bg-neutral-100 border border-neutral-300 rounded-lg px-2.5 py-1.5 text-neutral-800 focus:outline-none focus:ring-1 focus:ring-red-600 cursor-pointer"
+                className="text-[11px] sm:text-xs font-semibold bg-neutral-100 border border-neutral-300 rounded-lg px-2 sm:px-2.5 py-1 sm:py-1.5 text-neutral-800 focus:outline-none focus:ring-1 focus:ring-red-600 cursor-pointer"
               >
                 <option value="featured">Destaques</option>
                 <option value="discount">Maior Desconto %</option>
@@ -658,12 +650,12 @@ export default function App() {
       </nav>
 
       {/* 5. Main Product Catalog Section (Cards based on Image 2) */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-10">
         
         {/* Results Count & Active Category Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-6 pb-4 border-b border-neutral-200">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4 sm:mb-6 pb-2.5 sm:pb-4 border-b border-neutral-200">
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 font-display">
+            <h2 className="text-base sm:text-2xl font-bold text-neutral-900 font-display">
               {showOnlyFavorites
                 ? 'Meus Produtos Favoritos'
                 : selectedCategory === 'todos'
@@ -673,13 +665,13 @@ export default function App() {
           </div>
 
           {/* Quick Size Filter chips */}
-          <div className="flex items-center gap-1.5 flex-wrap text-xs">
-            <span className="text-neutral-500 font-semibold mr-1">Tamanhos:</span>
-            {['all', 'P', 'M', 'G', 'GG', '38', '39', '40', '41', '42'].map((sz) => (
+          <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap text-xs">
+            <span className="text-neutral-500 font-semibold mr-0.5 sm:mr-1 text-[11px] sm:text-xs">Tamanhos:</span>
+            {['all', 'P', 'M', 'G', 'GG'].map((sz) => (
               <button
                 key={sz}
                 onClick={() => setSelectedSizeFilter(sz)}
-                className={`px-2.5 py-1 rounded text-xs font-bold transition-all ${
+                className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded text-[10px] sm:text-xs font-bold transition-all ${
                   selectedSizeFilter === sz
                     ? 'bg-neutral-900 text-white'
                     : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
@@ -691,11 +683,11 @@ export default function App() {
           </div>
         </div>
 
-        {/* Product Cards Grid: 3 columns desktop, 2 columns mobile/tablet (Generous spacing gap-6 to gap-8 as per design guidelines) */}
+        {/* Product Cards Grid: 2 columns mobile (requested by user), 2 columns tablet, 3 columns desktop */}
         {filteredProducts.length === 0 ? (
-          <div className="py-20 text-center flex flex-col items-center justify-center bg-white rounded-xl border border-neutral-200 p-8">
-            <Search className="w-12 h-12 text-neutral-300 mb-3" />
-            <h3 className="text-lg font-bold text-neutral-900">Nenhum produto encontrado</h3>
+          <div className="py-16 sm:py-20 text-center flex flex-col items-center justify-center bg-white rounded-xl border border-neutral-200 p-6 sm:p-8">
+            <Search className="w-10 h-10 sm:w-12 sm:h-12 text-neutral-300 mb-3" />
+            <h3 className="text-base sm:text-lg font-bold text-neutral-900">Nenhum produto encontrado</h3>
             <p className="text-xs text-neutral-500 max-w-sm mt-1">
               Tente redefinir a busca por outro termo ou mude os filtros de tamanho e categoria.
             </p>
@@ -712,7 +704,7 @@ export default function App() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 lg:gap-8">
             {filteredProducts.map((product) => (
               <ProductCard
                 key={product.id}
@@ -727,24 +719,24 @@ export default function App() {
         )}
       </main>
 
-      {/* 6. Club Benefits & Sócio Advantage Banner (Cards 4 e 5 removidos conforme solicitado) */}
-      <section className="bg-neutral-100 border-t border-neutral-200 py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-r from-neutral-900 via-neutral-950 to-neutral-900 text-white p-6 sm:p-7 rounded-2xl border border-neutral-800 shadow-md flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-red-600/20 border border-red-500/30 text-yellow-400 flex items-center justify-center shrink-0">
-                <Sparkles className="w-6 h-6" />
+      {/* 6. Club Benefits & Sócio Advantage Banner */}
+      <section className="bg-neutral-100 border-t border-neutral-200 py-5 sm:py-8">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="bg-gradient-to-r from-neutral-900 via-neutral-950 to-neutral-900 text-white p-4 sm:p-7 rounded-2xl border border-neutral-800 shadow-md flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-red-600/20 border border-red-500/30 text-yellow-400 flex items-center justify-center shrink-0">
+                <Sparkles className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="bg-yellow-400 text-neutral-950 font-black text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider">
+                  <span className="bg-yellow-400 text-neutral-950 font-black text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider">
                     Sócio Gold: 30% OFF
                   </span>
-                  <h4 className="text-sm sm:text-base font-bold uppercase tracking-wide font-display text-white">
+                  <h4 className="text-xs sm:text-base font-bold uppercase tracking-wide font-display text-white">
                     Desconto Sócio Gold (30%)
                   </h4>
                 </div>
-                <p className="text-xs sm:text-sm text-neutral-300 mt-1 max-w-2xl leading-relaxed">
+                <p className="text-[11px] sm:text-sm text-neutral-300 mt-1 max-w-2xl leading-relaxed">
                   Desconto Sócio Gold (30%) em toda a Loja Oficial para associados do Poeirão! Vista o manto com vantagens exclusivas.
                 </p>
               </div>
@@ -753,7 +745,7 @@ export default function App() {
               href="https://sitepoeirao.com.br"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-6 py-3 bg-[#0080ff] hover:bg-[#006ce0] text-white text-xs font-bold rounded-xl shadow-md uppercase tracking-wider transition-all whitespace-nowrap shrink-0 hover:scale-[1.02]"
+              className="w-full sm:w-auto text-center px-5 py-2.5 sm:px-6 sm:py-3 bg-[#0080ff] hover:bg-[#006ce0] text-white text-xs font-bold rounded-xl shadow-md uppercase tracking-wider transition-all whitespace-nowrap shrink-0 hover:scale-[1.02]"
             >
               Seja sócio e aproveite o desconto →
             </a>
@@ -761,39 +753,39 @@ export default function App() {
         </div>
       </section>
 
-      {/* 7. Institutional Footer */}
+      {/* 7. Institutional Footer - Compacto e reduzido como solicitado (imagem 2) */}
       <footer className="bg-neutral-950 text-white border-t border-neutral-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3.5 sm:py-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
             
             {/* Column 1: Brand & Identity */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-7 bg-white rounded-b-md border border-black flex flex-col overflow-hidden">
+            <div className="col-span-2 md:col-span-1 space-y-1 sm:space-y-2">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <div className="w-4 h-5 sm:w-5 sm:h-6 bg-white rounded-b-md border border-black flex flex-col overflow-hidden shrink-0">
                   <div className="h-1/2 bg-[#dc2626] flex items-center justify-center">
-                    <span className="text-[7px] font-black text-white">PFC</span>
+                    <span className="text-[5px] sm:text-[6px] font-black text-white">PFC</span>
                   </div>
                   <div className="h-1/2 bg-black"></div>
                 </div>
-                <span className="text-lg font-extrabold tracking-wider font-display">
+                <span className="text-sm sm:text-base font-extrabold tracking-wider font-display">
                   SÓCIO POEIRÃO
                 </span>
               </div>
-              <p className="text-xs text-neutral-400 leading-relaxed">
-                Loja Oficial do Sócio Poeirão. Todos os direitos reservados. Produtos oficiais desenvolvidos para torcedores apaixonados.
+              <p className="text-[10px] sm:text-xs text-neutral-400 leading-tight">
+                Loja Oficial do Sócio Poeirão · Produtos oficiais desenvolvidos para a torcida rubro-negra.
               </p>
-              <div className="text-xs text-neutral-500">
-                Sede Oficial Poeirão · Estádio e Loja do Torcedor
+              <div className="text-[9px] sm:text-[11px] text-neutral-500">
+                Sede Oficial Poeirão · Estádio e Loja
               </div>
             </div>
 
             {/* Column 2: Categorias da Loja */}
             <div>
-              <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-3">Departamentos</h4>
-              <ul className="space-y-2 text-xs text-neutral-400">
+              <h4 className="text-[11px] sm:text-xs font-bold text-white uppercase tracking-wider mb-1 sm:mb-2">Departamentos</h4>
+              <ul className="space-y-0.5 sm:space-y-1.5 text-[10px] sm:text-xs text-neutral-400">
                 <li>
                   <button onClick={() => setSelectedCategory('camisas-oficiais')} className="hover:text-white">
-                    Camisas Oficiais de Jogo
+                    Camisas Oficiais
                   </button>
                 </li>
                 <li>
@@ -803,17 +795,17 @@ export default function App() {
                 </li>
                 <li>
                   <button onClick={() => setSelectedCategory('regatas')} className="hover:text-white">
-                    Regatas de Treino & Basquete
+                    Regatas de Treino
                   </button>
                 </li>
                 <li>
                   <button onClick={() => setSelectedCategory('calcados')} className="hover:text-white">
-                    Tênis Nike SB & Revolution 8
+                    Tênis e Calçados
                   </button>
                 </li>
                 <li>
                   <button onClick={() => setSelectedCategory('acessorios')} className="hover:text-white">
-                    Bonés e Mochilas Oficiais
+                    Bonés e Mochilas
                   </button>
                 </li>
               </ul>
@@ -821,16 +813,16 @@ export default function App() {
 
             {/* Column 3: Atendimento & Ajuda */}
             <div>
-              <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-3">Ajuda & Suporte</h4>
-              <ul className="space-y-2 text-xs text-neutral-400">
-                <li>
-                  <button onClick={() => setInfoModalType('duvidas')} className="hover:text-white">
-                    Dúvidas Frequentes (FAQ)
-                  </button>
-                </li>
+              <h4 className="text-[11px] sm:text-xs font-bold text-white uppercase tracking-wider mb-1 sm:mb-2">Ajuda & Suporte</h4>
+              <ul className="space-y-0.5 sm:space-y-1.5 text-[10px] sm:text-xs text-neutral-400">
                 <li>
                   <button onClick={() => setInfoModalType('fale-conosco')} className="hover:text-white">
                     Central de Atendimento
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => setInfoModalType('duvidas')} className="hover:text-white">
+                    Dúvidas Frequentes (FAQ)
                   </button>
                 </li>
                 <li>
@@ -840,7 +832,7 @@ export default function App() {
                 </li>
                 <li>
                   <button onClick={() => setInfoModalType('planos')} className="hover:text-white">
-                    Tabela de Planos de Sócio
+                    Planos de Sócio
                   </button>
                 </li>
                 <li>
@@ -852,46 +844,46 @@ export default function App() {
             </div>
 
             {/* Column 4: Pagamento & Segurança */}
-            <div className="space-y-3">
-              <h4 className="text-xs font-bold text-white uppercase tracking-wider">Formas de Pagamento</h4>
-              <div className="flex flex-wrap gap-2 text-neutral-300 text-xs">
-                <span className="bg-neutral-900 border border-neutral-800 px-2.5 py-1 rounded font-bold text-emerald-400">
+            <div className="col-span-2 md:col-span-1 space-y-1 sm:space-y-2">
+              <h4 className="text-[11px] sm:text-xs font-bold text-white uppercase tracking-wider">Formas de Pagamento</h4>
+              <div className="flex flex-wrap gap-1 sm:gap-1.5 text-neutral-300 text-[10px] sm:text-xs">
+                <span className="bg-neutral-900 border border-neutral-800 px-1.5 py-0.5 rounded font-bold text-emerald-400">
                   PIX Instantâneo
                 </span>
-                <span className="bg-neutral-900 border border-neutral-800 px-2.5 py-1 rounded font-medium">
+                <span className="bg-neutral-900 border border-neutral-800 px-1.5 py-0.5 rounded font-medium">
                   Visa
                 </span>
-                <span className="bg-neutral-900 border border-neutral-800 px-2.5 py-1 rounded font-medium">
+                <span className="bg-neutral-900 border border-neutral-800 px-1.5 py-0.5 rounded font-medium">
                   Mastercard
                 </span>
-                <span className="bg-neutral-900 border border-neutral-800 px-2.5 py-1 rounded font-medium">
+                <span className="bg-neutral-900 border border-neutral-800 px-1.5 py-0.5 rounded font-medium">
                   Elo
                 </span>
               </div>
-              <p className="text-[11px] text-neutral-500 pt-2">
-                Ambiente criptografado com certificação de segurança de ponta a ponta.
+              <p className="text-[9px] sm:text-[10px] text-neutral-500 pt-0.5 leading-tight">
+                Ambiente seguro com criptografia de ponta a ponta.
               </p>
             </div>
 
           </div>
 
-          <div className="mt-8 pt-8 border-t border-neutral-800 text-center text-xs text-neutral-400 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <span>© 2026 Loja Oficial Sócio Poeirão. Orgulho da Nação Rubro-Negra.</span>
+          <div className="mt-3 pt-3 sm:mt-6 sm:pt-6 border-t border-neutral-800/80 text-center text-xs text-neutral-400 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4">
+            <span className="text-[10px] sm:text-xs">© 2026 Loja Oficial Sócio Poeirão. Orgulho da Nação.</span>
 
             {/* Design & Identidade Visual Credits (João Paulo / Logo configurável no Cadeado) */}
-            <div className="flex items-center gap-2.5 bg-neutral-900 border border-neutral-800 px-4 py-2 rounded-full shadow-inner">
+            <div className="flex items-center gap-1.5 bg-neutral-900 border border-neutral-800 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full shadow-inner">
               {designerConfig.logoUrl ? (
                 <img
                   src={designerConfig.logoUrl}
                   alt={designerConfig.designerName}
-                  className="w-5 h-5 object-contain rounded-full bg-white/10 p-0.5 border border-yellow-400/60 shrink-0"
+                  className="w-3.5 h-3.5 sm:w-4 sm:h-4 object-contain rounded-full bg-white/10 p-0.5 border border-yellow-400/60 shrink-0"
                 />
               ) : (
-                <span className="w-5 h-5 rounded-full bg-yellow-400 text-neutral-950 font-black text-[9px] flex items-center justify-center shrink-0">
+                <span className="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-yellow-400 text-neutral-950 font-black text-[7px] sm:text-[8px] flex items-center justify-center shrink-0">
                   JP
                 </span>
               )}
-              <div className="flex items-center gap-1.5 text-xs">
+              <div className="flex items-center gap-1 text-[10px] sm:text-xs">
                 <span className="text-neutral-400">Design por</span>
                 {designerConfig.portfolioUrl ? (
                   <a
@@ -912,7 +904,7 @@ export default function App() {
                   </button>
                 )}
                 <span className="text-neutral-600">·</span>
-                <span className="text-[11px] text-yellow-400/90 font-medium">
+                <span className="text-[9px] sm:text-[10px] text-yellow-400/90 font-medium">
                   {designerConfig.role || 'Design & Identidade Visual'}
                 </span>
               </div>

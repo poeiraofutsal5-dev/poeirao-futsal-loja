@@ -26,7 +26,7 @@ export interface Product {
   stockQuantity?: number;
   customImageUrl?: string;
   isJersey?: boolean;
-  visualType: 'jersey_home' | 'jersey_away' | 'jersey_black' | 'jacket_travel' | 'hoodie_travel' | 'tank_heritage' | 'tank_dryfit' | 'shoe_sb' | 'shoe_runner' | 'slide_victori' | 'cap_trucker' | 'backpack';
+  visualType: 'jersey_home' | 'jersey_away' | 'jersey_black' | 'jacket_travel' | 'hoodie_travel' | 'tank_heritage' | 'tank_dryfit' | 'shoe_sb' | 'shoe_runner' | 'slide_victori' | 'cap_trucker' | 'backpack' | 'none';
   features: string[];
 }
 

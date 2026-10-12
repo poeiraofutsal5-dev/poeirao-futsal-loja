@@ -86,24 +86,24 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
         </button>
 
         {/* Left Side: Product Showcase Gallery (Nike clean background style) */}
-        <div className="md:w-1/2 bg-[#f5f5f5] p-6 sm:p-10 flex flex-col items-center justify-center relative border-b md:border-b-0 md:border-r border-neutral-200">
+        <div className="md:w-1/2 bg-[#f5f5f5] p-4 sm:p-10 flex flex-col items-center justify-center relative border-b md:border-b-0 md:border-r border-neutral-200">
             <ProductRender
               type={product.visualType}
               customImageUrl={product.customImageUrl}
-              className="max-h-72"
+              className="max-h-48 sm:max-h-72"
             />
 
           {/* Sócio Poeirão Seal */}
-          <div className="mt-4 flex items-center gap-2 bg-white/90 border border-neutral-200 rounded-full px-3 py-1 shadow-xs">
+          <div className="mt-3 sm:mt-4 flex items-center gap-2 bg-white/90 border border-neutral-200 rounded-full px-2.5 sm:px-3 py-1 shadow-xs">
             <div className="w-2 h-2 rounded-full bg-red-600"></div>
-            <span className="text-[11px] font-bold text-neutral-800 uppercase tracking-wider">
+            <span className="text-[10px] sm:text-[11px] font-bold text-neutral-800 uppercase tracking-wider">
               Produto Oficial Licenciado Poeirão
             </span>
           </div>
         </div>
 
         {/* Right Side: Product Buy Module */}
-        <div className="md:w-1/2 p-6 overflow-y-auto max-h-[85vh] flex flex-col space-y-4">
+        <div className="md:w-1/2 p-4 sm:p-6 overflow-y-auto max-h-[85vh] flex flex-col space-y-3 sm:space-y-4">
           
           {/* Header & Title */}
           <div>

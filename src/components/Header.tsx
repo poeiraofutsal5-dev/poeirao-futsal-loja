@@ -31,13 +31,13 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header className="sticky top-0 z-40 w-full shadow-lg bg-[#b91c1c] text-white">
       {/* Top Main Bar */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
-        <div className="flex items-center justify-between gap-4">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2 sm:py-3.5">
+        <div className="flex items-center justify-between gap-2 sm:gap-4">
           
           {/* Brand Crest & Club Name (Dynamically loaded from LogoConfig) */}
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <div
-              className="cursor-pointer"
+              className="cursor-pointer scale-90 sm:scale-100 origin-left"
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             >
               <ClubLogo config={logoConfig} size="md" />
@@ -49,7 +49,7 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             >
               <div className="flex items-center gap-1.5">
-                <span className="font-extrabold text-base sm:text-xl tracking-wider leading-none font-display uppercase">
+                <span className="font-extrabold text-sm sm:text-xl tracking-wider leading-none font-display uppercase">
                   LOJA OFICIAL DO POEIRÃO
                 </span>
               </div>
@@ -157,8 +157,8 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* Sub-Navigation Links */}
-      <div className="border-t border-red-700/60 bg-[#a61717] py-2 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto flex items-center justify-end gap-6 text-xs sm:text-sm font-semibold tracking-wide overflow-x-auto whitespace-nowrap">
+      <div className="border-t border-red-700/60 bg-[#a61717] py-1.5 sm:py-2 px-3 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto flex items-center justify-end gap-3.5 sm:gap-6 text-[11px] sm:text-sm font-semibold tracking-wide overflow-x-auto whitespace-nowrap no-scrollbar">
           <button
             onClick={() => onOpenInfoModal('sua-area')}
             className="text-white/95 hover:text-white hover:underline transition-all underline-offset-4"
