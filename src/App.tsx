@@ -24,7 +24,8 @@ import {
   ChevronRight, 
   SlidersHorizontal,
   Heart,
-  Search
+  Search,
+  Camera
 } from 'lucide-react';
 
 const DEFAULT_HERO_SLIDES: HeroSlide[] = [
@@ -207,6 +208,7 @@ export default function App() {
   // Direction Panel State (Password 22232425)
   const [isDirectionModalOpen, setIsDirectionModalOpen] = useState(false);
   const [isDirectionUnlocked, setIsDirectionUnlocked] = useState(false);
+  const [directionPanelTab, setDirectionPanelTab] = useState<'texto' | 'logos' | 'produtos' | 'banner' | 'designer'>('banner');
 
   // Category & Filter state
   const [selectedCategory, setSelectedCategory] = useState<ProductCategory>('todos');
@@ -488,7 +490,10 @@ export default function App() {
         onOpenCart={() => setIsCartOpen(true)}
         onOpenLoginModal={() => setSocioModalMode('login')}
         onOpenInfoModal={(type) => setInfoModalType(type)}
-        onOpenDirectionPanel={() => setIsDirectionModalOpen(true)}
+        onOpenDirectionPanel={() => {
+          setDirectionPanelTab('texto');
+          setIsDirectionModalOpen(true);
+        }}
         socioUser={socioUser}
         onLogoutSocio={() => setSocioUser({ isLoggedIn: false, name: '', cpf: '', planName: null, discountRate: 0.30 })}
         logoConfig={logoConfig}
@@ -523,6 +528,20 @@ export default function App() {
 
       {/* 3. Hero Campaign Showcase - Altura ampliada e frase destacada conforme solicitado (imagem 1) */}
       <section className="relative overflow-hidden bg-neutral-950 border-b border-neutral-800 text-white min-h-[210px] sm:min-h-[340px] lg:min-h-[400px] flex items-center">
+        {/* Botão Direto para Trocar/Editar Fotos de Fundo do Banner */}
+        <button
+          type="button"
+          onClick={() => {
+            setDirectionPanelTab('banner');
+            setIsDirectionModalOpen(true);
+          }}
+          className="absolute top-2.5 right-2.5 sm:top-4 sm:right-4 z-20 flex items-center gap-1.5 px-3 py-1.5 bg-black/70 hover:bg-black text-yellow-300 hover:text-yellow-200 border border-yellow-400/60 hover:border-yellow-400 rounded-full text-[10px] sm:text-xs font-bold backdrop-blur-md shadow-xl transition-all hover:scale-105 active:scale-95 cursor-pointer group"
+          title="Clique para trocar ou editar as fotos de fundo do site"
+        >
+          <Camera className="w-3.5 h-3.5 text-yellow-400 group-hover:rotate-12 transition-transform" />
+          <span>Trocar Fotos de Fundo</span>
+        </button>
+
         {/* Dynamic Background Slides Carousel (Imagens do time passando de fundo) */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden select-none">
           {heroSlides.map((slide, idx) => {
@@ -896,7 +915,10 @@ export default function App() {
                   </a>
                 ) : (
                   <button
-                    onClick={() => setIsDirectionModalOpen(true)}
+                    onClick={() => {
+                      setDirectionPanelTab('designer');
+                      setIsDirectionModalOpen(true);
+                    }}
                     className="font-bold text-white hover:text-yellow-400 transition-colors cursor-pointer"
                     title="Editar informações e logo do Design no Cadeado"
                   >
@@ -968,6 +990,7 @@ export default function App() {
         isUnlocked={isDirectionUnlocked}
         onUnlock={() => setIsDirectionUnlocked(true)}
         onLock={() => setIsDirectionUnlocked(false)}
+        initialTab={directionPanelTab}
         logoConfig={logoConfig}
         onUpdateLogoConfig={handleUpdateLogoConfig}
         designerConfig={designerConfig}
